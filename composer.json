@@ -1,0 +1,51 @@
+{
+  "name": "felixarntz/wp-admin-notices",
+  "description": "An API for registering and rendering WordPress admin notices.",
+  "version": "1.0.0",
+  "license": "GPL-2.0-or-later",
+  "type": "library",
+  "keywords": [
+    "wordpress",
+    "admin",
+    "notices"
+  ],
+  "homepage": "https://github.com/felixarntz/wp-admin-notices",
+  "authors": [
+    {
+      "name": "Felix Arntz",
+      "email": "hello@felix-arntz.me",
+      "homepage": "https://felix-arntz.me"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/felixarntz/wp-admin-notices/issues"
+  },
+  "autoload": {
+    "psr-4": {
+      "Felix_Arntz\\WP_Admin_Notices\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Felix_Arntz\\WP_Admin_Notices\\Tests\\PHPUnit\\Framework\\": "tests/phpunit/framework"
+    }
+  },
+  "require": {
+    "php": ">=7.0",
+    "felixarntz/contracts": "dev-master"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "^3.3",
+    "dealerdirect/phpcodesniffer-composer-installer": "^0.4",
+    "wp-coding-standards/wpcs": "^1",
+    "phpmd/phpmd": "^2.6",
+    "phpunit/phpunit": "^6"
+  },
+  "scripts": {
+    "phplint": "find -L .  -path ./vendor -prune -o -name '*.php' -print0 | xargs -0 -n 1 -P 4 php -l",
+    "phpcs": "@php ./vendor/bin/phpcs",
+    "phpmd": "@php ./vendor/bin/phpmd src text phpmd.xml.dist",
+    "phpunit": "@php ./vendor/bin/phpunit",
+    "phpunit-cov": "@php ./vendor/bin/phpunit --coverage-clover tests/logs/clover.xml"
+  }
+}

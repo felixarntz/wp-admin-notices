@@ -1,0 +1,83 @@
+sudo: false
+dist: trusty
+language: php
+cache:
+  directories:
+    - vendor
+    - $HOME/.composer/cache
+matrix:
+  include:
+    - php: 7.2
+      env: UNIT=1 PHPLINT=1 PHPCS=1 COVERAGE=1
+    - php: 7.0
+      env: UNIT=1 PHPLINT=1
+      dist: trusty
+    - php: nightly
+      env: UNIT=1
+  allow_failures:
+    - php: nightly
+      env: UNIT=1
+before_install:
+  - |
+    if [[ -z "$CC_TEST_REPORTER_ID" ]]; then
+      COVERAGE="0"
+    fi
+  - |
+    if [[ "$COVERAGE" == "1" ]]; then
+      curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+      chmod +x ./cc-test-reporter
+      ./cc-test-reporter before-build
+    fi
+  - |
+    if [[ "$COVERAGE" != "1" ]]; then
+      stable='^[0-9\.]+$'
+      if [[ "$TRAVIS_PHP_VERSION" =~ $stable ]]; then
+        phpenv config-rm xdebug.ini
+      fi
+    fi
+  - |
+    case "$TRAVIS_PHP_VERSION" in
+      5.6|5.5|5.4|5.3)
+        composer global require "phpunit/phpunit:^4"
+        composer install
+        PHPUNIT_BIN="phpunit"
+        ;;
+      5.2)
+        PHPUNIT_BIN="phpunit"
+        ;;
+      *)
+        composer install
+        PHPUNIT_BIN="vendor/bin/phpunit"
+        ;;
+    esac
+before_script:
+  - phpenv rehash
+script:
+  - |
+    if [[ "$PHPLINT" == "1" ]]; then
+      composer run-script phplint
+    fi
+  - |
+    if [[ "$PHPCS" == "1" ]]; then
+      composer run-script phpcs
+    fi
+  - |
+    if [[ "$PHPMD" == "1" ]]; then
+      composer run-script phpmd
+    fi
+  - |
+    if [[ "$UNIT" == "1" ]]; then
+      if [[ "$COVERAGE" == "1" ]]; then
+        mkdir -p tests/logs
+        $PHPUNIT_BIN --coverage-clover tests/logs/clover.xml
+      else
+        $PHPUNIT_BIN
+      fi
+    fi
+after_script:
+  - |
+    if [[ "$COVERAGE" == "1" ]]; then
+      ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+    fi
+notifications:
+  email: false
