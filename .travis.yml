@@ -35,21 +35,7 @@ before_install:
         phpenv config-rm xdebug.ini
       fi
     fi
-  - |
-    case "$TRAVIS_PHP_VERSION" in
-      5.6|5.5|5.4|5.3)
-        composer global require "phpunit/phpunit:^4"
-        composer install
-        PHPUNIT_BIN="phpunit"
-        ;;
-      5.2)
-        PHPUNIT_BIN="phpunit"
-        ;;
-      *)
-        composer install
-        PHPUNIT_BIN="vendor/bin/phpunit"
-        ;;
-    esac
+  - composer install
 before_script:
   - phpenv rehash
 script:
@@ -69,9 +55,9 @@ script:
     if [[ "$UNIT" == "1" ]]; then
       if [[ "$COVERAGE" == "1" ]]; then
         mkdir -p tests/logs
-        $PHPUNIT_BIN --coverage-clover tests/logs/clover.xml
+        vendor/bin/phpunit --coverage-clover tests/logs/clover.xml
       else
-        $PHPUNIT_BIN
+        vendor/bin/phpunit
       fi
     fi
 after_script:
